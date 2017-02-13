@@ -120,27 +120,33 @@ Now about the data augmentation techniques I experimented with. I tested the fol
 
 Here is an example of some of these transformations. The original image for comparison:
 
-![image1](/examples/00_original.png) "Original, steering angle == 0.00"
+![image1](/examples/00_original.png)
+*Original, steering angle == 0.00*
 
 Translated horizontally by 30 pixels:
 
-[image2]: ./examples/01_translate.png "Translated, steering angle == 0.09"
+![image2](/examples/01_translate.png)
+*Translated, steering angle == 0.09*
 
 Perspective transform to simulate a left turn / orientation of the car to the right edge of the lane:
 
-[image3]: ./examples/02_curvature.png "Curved to the left, steering angle == -0.32"
+![image3](/examples/02_curvature.png)
+*Curved to the left, steering angle == -0.32*
 
 Perspective transform to simulate a downhill road:
 
-[image4]: ./examples/03_incline_down.png "Incline downhill, steering angle == 0.00"
+![image4](/examples/03_incline_down.png)
+*Incline downhill, steering angle == 0.00*
 
 Perspective transform to simulate an uphill road:
 
-[image5]: ./examples/04_incline_up.png "Incline uphill, steering angle == 0.00"
+![image5](/examples/04_incline_up.png)
+*Incline uphill, steering angle == 0.00*
 
 Horizontal flip:
 
-[image6]: ./examples/05_flip.png "Flip, steering angle == -0.00"
+![image6](/examples/05_flip.png)
+*Flip, steering angle == -0.00*
 
 Results of my data augmentation experiments:
 
@@ -161,15 +167,15 @@ As mentioned above and unsurprisingly, trying to get the model to work on the ju
 
 Here are illustrations of these difficulties:
 
-![Sudden downhill part][./issues/issue02_downhill.png]
+![Sudden downhill part](/issues/issue02_downhill.png)
 
 The car can't see what lies ahead - and it's a sharp right turn. Exacerbating this, the left lane marking of the road is continued by the left lane marking of the distant road stretch on the horizon. The model might take this as a cue to drive straight.
 
-[Misleading road stretch on the horizon][./issues/issue03_misleading.png]
+![Misleading road stretch on the horizon](/issues/issue03_misleading.png)
 
 The road makes a sharp right turn, but there is also a straight stretch on the horizon, creating the illusion of a fork in the road.
 
-[Adjacent roads][./issues/issue04_adjacent.png]
+![Adjacent roads](/issues/issue04_adjacent.png)
 
 These two adjacent road stretches have nothing to do with each other, but the model had a lot of difficulties to tell which is the correct one to drive on. Initially it constantly tried to pull over to the other side of the road.
 
