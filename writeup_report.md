@@ -1,15 +1,5 @@
 **Behavrioal Cloning Project**
 
-The goals / steps of this project are the following:
-* Use the simulator to collect data of good driving behavior
-* Build, a convolutional neural network in Keras that predicts steering angles from images
-* Train and validate the model with a training and validation set
-* Test that the model successfully drives around track one without leaving the road
-* Summarize the results with a written report
-
-
-[//]: # (Image References)
-
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
@@ -101,7 +91,7 @@ In research papers I read I noticed a trend towards using fewer fully connected 
 
 Here is a visualization of the architecture. The default visualization that comes with Keras is not exactly pretty, but I didn't have the time to figure out how to generate a pretty one without having to manually draw it myself and at least it shows the layer dimensions:
 
-![Model architecture][./model.png]
+![Model architecture](./model.png)
 
 ####3. Creation of the Training Set & Training Process
 
