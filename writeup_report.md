@@ -1,6 +1,5 @@
-**Behavrioal Cloning Project**
+##Behavrioal Cloning Project
 
-## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 ---
@@ -118,35 +117,29 @@ Now about the data augmentation techniques I experimented with. I tested the fol
 * Three kinds of transformations came to my mind as possible candidates to correct off-center positions of the car on the lane and to ensure that it can handle sharp curves well: Rotation, horizontal translation, and a perspective transform simulating a change in the curvature of the road. I tested the effectiveness of all three and report my findings below.
 * Transforming the perspective to simulate an incline change uphill or downhill. The purpose of this was to use the data from the flat lake track to train the model for the mountain and jungle tracks, both of which contain many slope changes.
 
-Here is an example of some of these transformations. The original image for comparison:
+Here is an example of some of these transformations. The original image for comparison (steering angle == 0.00):
 
 ![image1](/examples/00_original.png)
-*Original, steering angle == 0.00*
 
-Translated horizontally by 30 pixels:
+Translated horizontally by 30 pixels (steering angle == 0.09):
 
 ![image2](/examples/01_translate.png)
-*Translated, steering angle == 0.09*
 
-Perspective transform to simulate a left turn / orientation of the car to the right edge of the lane:
+Perspective transform to simulate a left turn / orientation of the car to the right edge of the lane (steering angle == -0.32):
 
 ![image3](/examples/02_curvature.png)
-*Curved to the left, steering angle == -0.32*
 
-Perspective transform to simulate a downhill road:
+Perspective transform to simulate a downhill road (steering angle == 0.00):
 
 ![image4](/examples/03_incline_down.png)
-*Incline downhill, steering angle == 0.00*
 
-Perspective transform to simulate an uphill road:
+Perspective transform to simulate an uphill road (steering angle == 0.00):
 
 ![image5](/examples/04_incline_up.png)
-*Incline uphill, steering angle == 0.00*
 
-Horizontal flip:
+Horizontal flip (steering angle == -0.00):
 
 ![image6](/examples/05_flip.png)
-*Flip, steering angle == -0.00*
 
 Results of my data augmentation experiments:
 
