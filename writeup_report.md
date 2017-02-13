@@ -30,14 +30,14 @@ The part of the model.py file that contains the code for creating, training and 
 ####1. An appropriate model architecture has been employed
 
 The architecture of my model is as follows (lines 643-680 of model.py):
-- Color image input with dimensions 80x160x3
-- Keras Cropping2D layer to crop the input to 50x150 pixels
-- Keras Lambda layer to convert the feature value range to [-1,1]
-- Three convolutional layers with depths 32, 64, and 128, filter sizes 8x8, 5x5, and 3x3, and strides 4, 2, and 2.
-- One dense layer with 512 units following the conv layers, and one output unit
-- ELUs as nonlinearities after each layer except the output unit
-- Batch normalization after each layer except the output unit
-- Dropout after the second and third conv layers (both rates 0.3) and after the first dense layer (rate 0.5)
+* Color image input with dimensions 80x160x3
+* Keras Cropping2D layer to crop the input to 50x150 pixels
+* Keras Lambda layer to convert the feature value range to [-1,1]
+* Three convolutional layers with depths 32, 64, and 128, filter sizes 8x8, 5x5, and 3x3, and strides 4, 2, and 2.
+* One dense layer with 512 units following the conv layers, and one output unit
+* ELUs as nonlinearities after each layer except the output unit
+* Batch normalization after each layer except the output unit
+* Dropout after the second and third conv layers (both rates 0.3) and after the first dense layer (rate 0.5)
 
 ####2. Attempts to reduce overfitting in the model
 
@@ -91,7 +91,7 @@ In research papers I read I noticed a trend towards using fewer fully connected 
 
 Here is a visualization of the architecture. The default visualization that comes with Keras is not exactly pretty, but I didn't have the time to figure out how to generate a pretty one without having to manually draw it myself and at least it shows the layer dimensions:
 
-![Model architecture](./model.png)
+![Model architecture](model.png)
 
 ####3. Creation of the Training Set & Training Process
 
@@ -113,14 +113,14 @@ I reduced the original size of the recorded images (160x320 pixels) by half in b
 
 Now about the data augmentation techniques I experimented with. I tested the following:
 
-- Flipping images horizontally to prevent a bias towards being able to handle some situations only in one direction but not the other. The steering angle is being inverted (additive inverse) accordingly.
-- Changing the brightness, particularly decreasing it, to make the model less dependent on certain colors, to make it recognize lane markings with less contrast, and to cater to the darker colors of the mountain track.
-- Three kinds of transformations came to my mind as possible candidates to correct off-center positions of the car on the lane and to ensure that it can handle sharp curves well: Rotation, horizontal translation, and a perspective transform simulating a change in the curvature of the road. I tested the effectiveness of all three and report my findings below.
-- Transforming the perspective to simulate an incline change uphill or downhill. The purpose of this was to use the data from the flat lake track to train the model for the mountain and jungle tracks, both of which contain many slope changes.
+* Flipping images horizontally to prevent a bias towards being able to handle some situations only in one direction but not the other. The steering angle is being inverted (additive inverse) accordingly.
+* Changing the brightness, particularly decreasing it, to make the model less dependent on certain colors, to make it recognize lane markings with less contrast, and to cater to the darker colors of the mountain track.
+* Three kinds of transformations came to my mind as possible candidates to correct off-center positions of the car on the lane and to ensure that it can handle sharp curves well: Rotation, horizontal translation, and a perspective transform simulating a change in the curvature of the road. I tested the effectiveness of all three and report my findings below.
+* Transforming the perspective to simulate an incline change uphill or downhill. The purpose of this was to use the data from the flat lake track to train the model for the mountain and jungle tracks, both of which contain many slope changes.
 
 Here is an example of some of these transformations. The original image for comparison:
 
-[image1]: ./examples/00_original.png "Original, steering angle == 0.00"
+![image1](/examples/00_original.png) "Original, steering angle == 0.00"
 
 Translated horizontally by 30 pixels:
 
@@ -144,12 +144,12 @@ Horizontal flip:
 
 Results of my data augmentation experiments:
 
-- Horizontal flipping: This one is a no-brainer - unsurprisingly it turned out to be very useful.
-- Changing the brightness: It had exactly the desired effect. Thanks to decreasing the brightness of the lake track images, the model was able to drive on the mountain track without ever having seen it during training. Depending on the training iteration, I randomly varied the brightness of 10-50% of the images between factor 0.4 and 1.5 of the original brightness.
-- Translation: Horizontal translation is just an extension of the effect of using the left and right camera images and turned out to be very useful, if not essential, to training a model that stays close to the center of the lane. I randomly horizontally translated the images by 0 to 40 pixels, sometimes 0 to 50 pixels, and steering angle adjustments of 0.003-0.004 per pixel of translation turned out to yield reasonable correction speeds that are neither too abrupt on straight roads nor too slow in sharp curves. Vertical translation turned out to be unnecessary. I did it a little bit (0-10 pixels) just to create more diverse data, but vertical translation does not serve as an even remotely realistic proxy for simulating changes in the slope of the road.
-- Curvature perspective transform: This turned out to be useful to simulate sharper curves on the one hand, but even more importantly it simulates situations in which the car is oriented at an angle to the lane rather than parallel to the lane. The image above illustrates this effect. If you compare the central vertical gridline in the original image and the distorted image you see that the distorted image simulates the car being oriented toward the side of the lane rather than toward the center of the road as in the original image. Of course, this primitive perspective distortion is a very imperfect proxy for a change in the curvature of the road. To truly increase the sharpness of a curve in a realistic way for example, one can of course not just shift the pixels in the linear way that this transform does, but this approximation still did an alright job. In order to understand the steering angle adjustment factor you would have to read the code, but I documented the generator function in great detail in case you're interested.
-- Rotation: I experimented with rotating images to simulate a change in the curvature of the road, but in most cases this does not yield a realistic approximation, and more importantly it is inferior to the perspective transform described above. I did not end up using this transform.
-- Incline perspective transform: While it generally actually is a more realistic approximation than the curvature transform above, it turned out to be completely unnecessary - I did not end up using this.
+* Horizontal flipping: This one is a no-brainer - unsurprisingly it turned out to be very useful.
+* Changing the brightness: It had exactly the desired effect. Thanks to decreasing the brightness of the lake track images, the model was able to drive on the mountain track without ever having seen it during training. Depending on the training iteration, I randomly varied the brightness of 10-50% of the images between factor 0.4 and 1.5 of the original brightness.
+* Translation: Horizontal translation is just an extension of the effect of using the left and right camera images and turned out to be very useful, if not essential, to training a model that stays close to the center of the lane. I randomly horizontally translated the images by 0 to 40 pixels, sometimes 0 to 50 pixels, and steering angle adjustments of 0.003-0.004 per pixel of translation turned out to yield reasonable correction speeds that are neither too abrupt on straight roads nor too slow in sharp curves. Vertical translation turned out to be unnecessary. I did it a little bit (0-10 pixels) just to create more diverse data, but vertical translation does not serve as an even remotely realistic proxy for simulating changes in the slope of the road.
+* Curvature perspective transform: This turned out to be useful to simulate sharper curves on the one hand, but even more importantly it simulates situations in which the car is oriented at an angle to the lane rather than parallel to the lane. The image above illustrates this effect. If you compare the central vertical gridline in the original image and the distorted image you see that the distorted image simulates the car being oriented toward the side of the lane rather than toward the center of the road as in the original image. Of course, this primitive perspective distortion is a very imperfect proxy for a change in the curvature of the road. To truly increase the sharpness of a curve in a realistic way for example, one can of course not just shift the pixels in the linear way that this transform does, but this approximation still did an alright job. In order to understand the steering angle adjustment factor you would have to read the code, but I documented the generator function in great detail in case you're interested.
+* Rotation: I experimented with rotating images to simulate a change in the curvature of the road, but in most cases this does not yield a realistic approximation, and more importantly it is inferior to the perspective transform described above. I did not end up using this transform.
+* Incline perspective transform: While it generally actually is a more realistic approximation than the curvature transform above, it turned out to be completely unnecessary - I did not end up using this.
 
 All the transforms above are defined as small helper functions in lines 117-250 of model.py.
 
