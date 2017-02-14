@@ -6,15 +6,13 @@ Created on Sun Feb 12 20:37:26 2017
 @author: pierluigiferrari
 """
 
-import pickle
-import tensorflow as tf
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
 from keras.models import Sequential, load_model
-from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
+from keras.layers.core import Dense, Flatten, Dropout, Lambda
 from keras.layers.advanced_activations import ELU
 from keras.layers.convolutional import Convolution2D, Cropping2D
-from keras.layers.pooling import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau 
@@ -270,7 +268,7 @@ def generate_batch(filenames,
     Generate batches of samples and corresponding labels indefinitely from
     lists of filenames and labels.
     
-    Returns two numpy arrays, one containing the next `batch_size` samples
+    Yields two numpy arrays, one containing the next `batch_size` samples
     from `filenames`, the other containing the corresponding labels from
     `labels`.
     
@@ -318,10 +316,9 @@ def generate_batch(filenames,
     All conversions and transforms default to `False`.
     
     Args:
-        filenames (array-like): A 1-D list or numpy array containing all
-            relative file paths to the samples from which the batches are to be
-            generated. Note that `filenames` must not contain the actual files
-            themselves.
+        filenames (array-like): A 1-D list or numpy array containing all file
+            paths to the samples from which the batches are to be generated.
+            Note that `filenames` must not contain the actual files themselves.
         labels (array-like): A list or numpy array containing the labels
             corresponding to the samples. Important note: Label lists are now
             expected to contain tuples of two floats for each sample for some
@@ -422,7 +419,8 @@ def generate_batch(filenames,
             current = 0
         
         for filename in filenames[current:current+batch_size]:
-            with Image.open('./data/{}'.format(filename)) as img:
+            with Image.open(filename) as img:
+            #with Image.open('./data/{}'.format(filename)) as img:
                 batch_X.append(np.array(img))
         batch_y = deepcopy(labels[current:current+batch_size])
         current += batch_size
@@ -660,12 +658,11 @@ def build_model():
     model.add(ELU())
     model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="valid"))
     model.add(BatchNormalization(axis=3, momentum=0.99))
-    model.add(Dropout(.3))
     model.add(ELU())
     model.add(Convolution2D(128, 3, 3, subsample=(2, 2), border_mode="valid"))
     model.add(BatchNormalization(axis=3, momentum=0.99))
     model.add(Flatten())
-    model.add(Dropout(.3))
+    model.add(Dropout(.5))
     model.add(ELU())
     model.add(Dense(512))
     model.add(BatchNormalization(axis=1, momentum=0.99))
