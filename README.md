@@ -148,3 +148,9 @@ These two adjacent road stretches have nothing to do with each other, but the mo
 In order to teach the model to drive on the jungle track, but at the same time not forget how to drive on the lake track, I took a model that was already able to drive well on the lake track (which had been trained for 6 epochs) and trained it for 2 additional epochs on the entire combined training dataset (45,000 images for the lake track plus 36,000 images for the jungle track, minus 10% of that for the validation data). This turned out to be enough to get the model to drive well on both tracks.
 
 Even though it was a problem initially on the jungle track when I didn't limit car's speed, because it would get too fast downhill and miss immediately consecutive turns, surprisingly I managed to get it to a point where it can run laps on the jungle track even without any speed limitation if the default throttle is set to 0.2. I still modified the drive.py to ensure a minimum speed of 12 mph (because otherwise watching the car drive on the jungle track is tedious) and a maximum of 24 mph so that the car drives more smoothly. Feel free to remove the max speed though - the driving will be less clean, but it will still work.
+
+###Training Results
+
+Watch the trained model drive autonomously around the lake track that it has been trained on:
+
+[![Lake Track](https://img.youtube.com/vi/81Sqcy26TB8/0.jpg)](https://www.youtube.com/watch?v=81Sqcy26TB8)
