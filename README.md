@@ -2,7 +2,7 @@
 
 ###Overview
 
-The goal of this project is to train a Convolutional Neural Network built with [Keras](https://keras.io) to learn to drive a car around tracks in a simulator by mimicking human driving behavior via end-to-end learning, i.e. predicting steering angles directly from the image input of a single front-facing camera.
+The goal of this project is to train a Convolutional Neural Network built with [Keras](https://keras.io) to learn to drive a car around tracks in a simulator by mimicking human driving behavior via end-to-end learning, i.e. predicting steering angles directly from the image input of a single front-facing camera. You can find videos of the training results at the bottom of this page.
 
 * model.py contains the script to create and train the model
 * drive.py uses predictions from model.h5 to feed steering commands to the car in autonomous mode in the simulator available [here](github.com/udacity/self-driving-car-sim)
