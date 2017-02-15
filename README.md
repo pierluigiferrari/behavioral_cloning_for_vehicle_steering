@@ -151,6 +151,22 @@ Even though it was a problem initially on the jungle track when I didn't limit c
 
 ###Training Results
 
-Watch the trained model drive autonomously around the lake track that it has been trained on:
+Watch the trained model drive autonomously on the lake track that it has been trained on (click on the image to watch the video):
 
-[![Lake Track](https://img.youtube.com/vi/81Sqcy26TB8/0.jpg)](https://www.youtube.com/watch?v=81Sqcy26TB8)
+[![01_Lake_Track](https://img.youtube.com/vi/81Sqcy26TB8/0.jpg)](https://www.youtube.com/watch?v=81Sqcy26TB8)
+
+Here is the same model, driving on a mountain track that it has never seen during training:
+
+[![02_Mountain_Track](https://img.youtube.com/vi/KJol9AnE5qc/0.jpg)](https://www.youtube.com/watch?v=KJol9AnE5qc)
+
+And here it is driving around the more challenging jungle track:
+
+[![03_Jungle_Track](https://img.youtube.com/vi/Zj6tGci2z3M/0.jpg)](https://www.youtube.com/watch?v=Zj6tGci2z3M)
+
+Of course the model could still get a lot better: It often over-compensates when it recovers from the edge of the lane, it doesn't care at all about there being two lanes in the jungle track, and it cuts some turns too closely.
+
+Part of this suboptimal behavior already starts with the training data I recorded: Trying to input very precise steering commands with a keyboard, mouse or game controller makes you appreciate what an amazingly precise input device a real steering wheel is. It is very difficult to stay in the center of the lane at all times, and I don't need to mention that I could absolutely not manage to do that. My own recorded driving behavior was slightly better, if at all, than what the model does in the videos above (I, too, ignored the two lanes in the jungle track) and it is the upper bound to how good the model can get.
+
+Another reason for flaws in model's behavior are flaws in my image transformations: The only geometric transformation that does not degrade the quality of the input data is the horizontal flip. All other above geometric transformations are flawed approximations of the real phenomena they are trying to simulate, and my steering angle adjustments, however carefully chosen, are also flawed approximations of the ideal steering angles.
+
+For the purpose of this experiment though, the point is: The model learned to run laps around all of these tracks, one of which it hasn't even seen during training, from nothing but my shitty driving data :).
