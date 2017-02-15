@@ -169,4 +169,4 @@ Part of this suboptimal behavior starts with the training data I recorded: Tryin
 
 Another reason for flaws in model's behavior are flaws in my image transformations: The only geometric transformation that does not degrade the quality of the input data is the horizontal flip. All other above geometric transformations are flawed approximations of the real phenomena they are trying to simulate, and my steering angle adjustments, however carefully chosen, are also flawed approximations of the ideal steering angles.
 
-For the purpose of this experiment though, the point is: The model learned to run laps around all of these tracks, one of which it hasn't even seen during training, from nothing but my shitty driving data :).
+For the purpose of this experiment though, the point is: The model learned to run laps around all of these tracks, one of which it hasn't even seen during training, from nothing but my shitty recorded driving :).
