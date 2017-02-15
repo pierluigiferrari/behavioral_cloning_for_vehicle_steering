@@ -1,12 +1,12 @@
-##Behavrioal Cloning for Autonomous Driving Project
+##Behavioral Cloning for Autonomous Driving Project
 
 ###Overview
 
-The goal of this project is to train a Convolutional Neural Network built with Keras to learn how to drive a car around tracks in a simulator by mimicking human driving behavior via end-to-end learning, i.e. predicting steering angles directly from the image input of a single front-facing camera.
+The goal of this project is to train a Convolutional Neural Network built with [Keras](https://keras.io) to learn to drive a car around tracks in a simulator by mimicking human driving behavior via end-to-end learning, i.e. predicting steering angles directly from the image input of a single front-facing camera.
 
 * model.py contains the script to create and train the model
-* drive.py is for driving the car in autonomous mode using the simulator available [here](github.com/udacity/self-driving-car-sim)
-* model.h5 contains a trained convolution neural network
+* drive.py uses predictions from model.h5 to feed steering commands to the car in autonomous mode in the simulator available [here](github.com/udacity/self-driving-car-sim)
+* model.h5 contains trained Keras model
 
 Using the simulator linked above and the drive.py file, the car can drive autonomously around both available tracks by executing
 ```sh
@@ -17,18 +17,18 @@ The model only predicts steering angles - throttle, minimum and maximum speed ar
 
 ###Structure of model.py
 
-The part of the model.py file that contains the code for creating, training and saving the Keras model starts in line 643. The lines before define a number of helper functions that are part of the overall training pipeline: An `assemble_filelists()` function to assemble lists of the available training data from the drive_log.csv file that the simulator creates when recording driving data, a `generate_batch()` generator function used by Keras' `fit_generator()` function to train the model, and a bunch of image transformation functions that are used by the generator to do ad-hoc data augmentation during training. These helper functions are documented in detail where relevant.
+The part of the model.py file that contains the code for creating, training and saving the Keras model starts in line 643. The lines before define a number of helper functions that are part of the overall training pipeline: An `assemble_filelists()` function to assemble lists of the available training data from the drive_log.csv file that the simulator creates when recording driving data, a `generate_batch()` generator function used by Keras' `fit_generator()` function to train the model, and a bunch of image transformation functions that are used by the generator to do ad-hoc data augmentation during training.
 
 ###Model Architecture
 
-Initially I trained two different promising architectures to see if I was able to measure a significant difference in performance between the two. The first was the architecture from NVIDIA's 2016 paper ["End to End Learning for Self-Driving Cars"](https://arxiv.org/abs/1604.07316), albeit with different input dimensions of 50x150 pixels, the second was a modified version of [this](https://github.com/commaai/research/blob/master/train_steering_model.py) Comma.ai model.
+Initially I trained two different promising architectures to see if I was able to measure a significant difference in performance between the two. The first is the architecture from NVIDIA's 2016 paper ["End to End Learning for Self-Driving Cars"](https://arxiv.org/abs/1604.07316), the second is a modified version of [this](https://github.com/commaai/research/blob/master/train_steering_model.py) Comma.ai model.
 
-For this particular problem I was not able to measure a significant difference in performance between the two architectures and got good results with both, so I stuck with the latter architecture that you can see below. While model architecture is always important, as long as you pick one of many possible suitable architectures, the kind of data you collect and the data augmentation techniques you apply are the much more crucial and more difficult parts to solve this problem well. In other words, the particular model architecture you choose, as long as it's big/deep enough, will likely not be the limiting factor here - the collected data and data augmentation techniques will be.
+For this particular problem I was not able to measure a significant difference in performance between the two architectures and got good results with both, so I stuck with the latter architecture, see details below. While model architecture is always important, as long as you pick one of many possible suitable architectures, the data you collect and the data augmentation techniques you apply are the much more crucial and more difficult parts to solve this problem well. In other words, the particular model architecture you choose, as long as it's big/deep enough, will likely not be the limiting factor here - the collected data and data augmentation techniques will be.
 
-Hence, the majority of my work here focused on the collection and processing of the training data rather than on architecture selection.
+Hence, the majority of the work here focuses on the collection and processing of the training data rather than on model hyper parameter tuning.
 
 The architecture of the final model is as follows:
-* Color image input with dimensions 80x160x3
+* RGB image input with dimensions 80x160x3
 * Keras Cropping2D layer to crop the input to 50x150 pixels
 * Keras Lambda layer to convert the feature value range to [-1,1]
 * Three convolutional layers with depths 32, 64, and 128, filter sizes 8x8, 5x5, and 3x3, and strides 4, 2, and 2.
@@ -37,9 +37,9 @@ The architecture of the final model is as follows:
 * Batch normalization after each layer except the output unit
 * Dropout after the third conv and first dense layer (both rate 0.5)
 
-Instead of following the conv layers with max pooling layers I used a convolutional stride greater than 1, namely 4 for the first conv layer and 2 for the second and third conv layers. I didn't do this because I had good theoretical reasons for it, but because the Comma.ai model that my model is based on did it this way and I considered it an experiment to see if it would produce good results. Intuitively, reducing complexity through pooling should be superior over reducing complexity by increasing the stride in the conv layers, since the former method chooses the most relevant information out of all possible filter positions, while the latter method loses information by skipping many filter positions to begin with. In practice, however, it seems to work well enough.
+Instead of following the conv layers with max pooling layers I used a convolutional stride greater than 1, namely 4 for the first conv layer and 2 for the second and third conv layers. I didn't do this because I had good theoretical reasons for it, but because the Comma.ai model that my model is based on did it this way and I considered it an experiment to see if it would produce good results. Intuitively, reducing complexity through pooling should be superior over reducing complexity by increasing the stride in the conv layers, since the former method chooses the most relevant information out of all possible filter positions, while the latter method loses information by skipping part of the possible filter positions to begin with. In practice, however, it seems to work well enough.
 
-I'm not sure why the default choice for non-linearities still seems to be ReLUs as I am writing this, but unless you for some reason require the property to have a threshold at zero, ELUs are strictly better ReLUs.
+I'm not sure why the default choice for non-linearities still seems to be ReLUs as I am writing this, but unless for some reason you require the property to have a threshold at zero, ELUs are strictly better ReLUs.
 
 Batch normalization helps reduce overfitting, so feel free to remove the dropout layers (monitor your validation loss though). I did not encounter signs of overfitting in general, even without the dropout layers.
 
@@ -51,17 +51,17 @@ Here is a visualization of the architecture. The default visualization that come
 
 ###Data Collection and Preprocessing
 
-The simulator records image data from three cameras, one center camera and one each on the far left and right sides of the car, and it records 10 images per second per camera. The images from the two non-center cameras simulate the effect of the car being too far left or too far right in the lane and by adding or subtracting an appropriate offset to/from the respective center camera steering angle, one can effectively produce artificial recovery data.
+The simulator records image data from three cameras, one center camera and one camera on each the far left and right sides of the car, recording 10 images per second. The images from the two non-center cameras simulate the effect of the car being too far left or too far right in the lane and by adding or subtracting an appropriate offset to/from the respective center camera steering angle, one can effectively produce artificial recovery data.
 
 Note that I deliberately did not record any recovery data, i.e. I did not record any data of the car correcting its course from the edges of the lane back towards the center. Since real cars on real roads cannot really make use of this technique and can still learn how to drive autonomously, my model should be able to learn without such data, too. Instead I used the data from all three cameras for the training and hoped that the left and right camera images and some geometric transformations of the images would be enough to produce the same effect that recovery data would, which turned out to be true. Not to mention that it is a lot more efficient than recording lots of manually produced recovery data.
 
-First I recorded roughly four laps (maybe it was a bit less) of good driving behavior in the default direction (counter-clockwise) on the lake track (track 1), followed by roughly four laps in the reverse direction (clock-wise). I ended up with a little more than 45,000 images when I was done recording, i.e. around 15,000 per camera.
+I recorded roughly four laps (maybe it was a bit less) of good driving behavior in the default direction (counter-clockwise) on the lake track (track 1), followed by roughly four laps in the reverse direction (clock-wise). I ended up with a little more than 45,000 images when I was done recording, i.e. around 15,000 per camera.
 
-With that data from the lake track only I wanted to get the model to master the lake track and see how far I can get on the mountain and jungle tracks without using any data recorded on those tracks.
+With that data from the lake track only I wanted to get the model to master the lake track and see how far I would get on the mountain and jungle tracks without using any data recorded on those tracks.
 
-I later also recorded around 36,000 images of good driving behavior on the jungle track, or around 12,000 images per camera.
+I also recorded around 36,000 images of good driving behavior on the jungle track, i.e. around 12,000 images per camera.
 
-I reduced the original size of the recorded images (160x320 pixels) by half in both dimensions to 80x160 pixels. I then cropped away the top 20 and the bottom 10 pixels because they just contain the sky and the hood of the car, respectively - visual information that is irrelevant to predict the steering angle. I also cropped away 5 pixels each on the left and right for the same reason. It might be useful to crop even more pixels from the top to eliminate even more irrelevant or even misleading image information, but I got satisfactory results with my processing.
+I reduced the original size of the recorded images (160x320 pixels) by half in both dimensions to 80x160 pixels and then cropped 20 pixels at the top and 10 pixels at the bottom because they only contain the sky and the hood of the car - visual information that is irrelevant to predict the steering angle. I also cropped 5 pixels each on the left and right for the same reason. It might be useful to crop even more pixels from the top to eliminate even more irrelevant or even misleading image information, but I got satisfactory results with this processing.
 
 ###Steering Angle Adjustment for the Left and Right Camera Images
 
@@ -71,20 +71,20 @@ Of course non-center camera images are just two specific cases of horizontal tra
 
 ###Data Augmentation
 
-Data augmentation is essential to solve this problem, training on data of good driving behavior alone will not result in a working model. At the same time it is more difficult in this case than in a classification task, since for many relevant transformations of the input data, the corresponding labels need to be adjusted in a non-trivial way. A bear is still a bear whether you flip the image or not, but the steering angle of the perspectively distorted image of a road might need to be adjusted in a non-obvious way. Figuring out how exactly to adjust the steering angle for some transformations turns into a project of its own, and a lot of work goes into it. Below I describe the transformations I experimented with and my findings regarding what transformations worked or didn't work, were useful or were unnecessary, and what steering angle adjustments turned out to work well.
+Data augmentation is essential to solve this problem, training on data of good driving behavior alone will not result in a working model. At the same time data augmentation is also more complex in this case than in a classification task, since for many relevant transformations of the input data, the corresponding labels need to be adjusted in a non-trivial way. A bear is a bear whether you flip the image or not, but the steering angle of the perspectively distorted image of a road might need to be adjusted in a non-obvious way. Figuring out how exactly to adjust the steering angle for some transformations turns into a project of its own, and a lot of work goes into it. Below I describe the transformations I experimented with and my findings regarding which transformations worked or didn't work, which were useful or unnecessary, and what steering angle adjustments turned out to work well.
 
-Now about the data augmentation techniques I experimented with. I tested the following:
+I tested the following image transformations:
 
 * Flipping images horizontally to prevent a bias towards being able to handle some situations only in one direction but not the other. The steering angle is being inverted (additive inverse) accordingly.
 * Changing the brightness, particularly decreasing it, to make the model less dependent on certain colors, to make it recognize lane markings with less contrast, and to cater to the darker colors of the mountain track.
-* Three kinds of transformations came to my mind as possible candidates to correct off-center positions of the car on the lane and to ensure that it can handle sharp curves well: Rotation, horizontal translation, and a perspective transform simulating a change in the curvature of the road. I tested the effectiveness of all three and report my findings below.
+* Three kinds of transformations came to my mind as possible candidates to recover from off-center positions and to ensure that the model can handle sharp curves: Rotation, horizontal translation, and a perspective transform simulating a change in the curvature of the road. I tested the effectiveness of all three and report my findings below.
 * Transforming the perspective to simulate an incline change uphill or downhill. The purpose of this was to use the data from the flat lake track to train the model for the mountain and jungle tracks, both of which contain many slope changes.
 
 Here is an example of some of these transformations. The original image for comparison (steering angle == 0.00):
 
 ![image1](/examples/00_original.png)
 
-Translated horizontally by 30 pixels (steering angle == 0.09):
+Translated horizontally by 30 pixels (steering angle == -0.09):
 
 ![image2](/examples/01_translate.png)
 
@@ -106,9 +106,9 @@ Horizontal flip (steering angle == -0.00):
 
 Results of my data augmentation experiments:
 
-* Horizontal flipping: This one is a no-brainer - unsurprisingly it turned out to be very useful.
-* Changing the brightness: It had exactly the desired effect. Thanks to decreasing the brightness of the lake track images, the model was able to drive on the mountain track without ever having seen it during training. Depending on the training iteration, I randomly varied the brightness of 10-50% of the images between factor 0.4 and 1.5 of the original brightness.
-* Translation: Horizontal translation is just an extension of the effect of using the left and right camera images and turned out to be very useful, if not essential, to training a model that stays close to the center of the lane. I randomly horizontally translated the images by 0 to 40 pixels, sometimes 0 to 50 pixels, and steering angle adjustments of 0.003-0.004 per pixel of translation turned out to yield reasonable correction speeds that are neither too abrupt on straight roads nor too slow in sharp curves. Vertical translation turned out to be unnecessary. I did it a little bit (0-10 pixels) just to create more diverse data, but vertical translation does not serve as an even remotely realistic proxy for simulating changes in the slope of the road.
+* Horizontal flipping: This one is a no-brainer - unsurprisingly it helps a lot and should always be applied (randomly to half of your data).
+* Changing the brightness: It had exactly the desired effect. Thanks to decreasing the brightness of the lake track images, the model was able to drive on the much darker mountain track without ever having seen it during training. Depending on the training iteration, I randomly varied the brightness of 10-50% of the images between factor 0.4 and 1.5 of the original brightness.
+* Translation: Horizontal translation is just an extension of the effect of using the left and right camera images and is very helpful, if not essential, to training a model that stays close to the center of the lane. I randomly translated the images by 0 to 40 pixels, sometimes 0 to 50 pixels. Steering angle adjustments of 0.003-0.004 per pixel of translation turned out to yield reasonable correction speeds that are neither too abrupt on straight roads nor too slow in sharp curves. Vertical translation turned out to be unnecessary. I did it a little bit (0-10 pixels) just to create more diverse data, but vertical translation does not serve as an even remotely realistic proxy for simulating changes in the slope of the road.
 * Curvature perspective transform: This turned out to be useful to simulate sharper curves on the one hand, but even more importantly it simulates situations in which the car is oriented at an angle to the lane rather than parallel to the lane. The image above illustrates this effect. If you compare the central vertical gridline in the original image and the distorted image you see that the distorted image simulates the car being oriented toward the side of the lane rather than toward the center of the road as in the original image. Of course, this primitive perspective distortion is a very imperfect proxy for a change in the curvature of the road. To truly increase the sharpness of a curve in a realistic way for example, one can of course not just shift the pixels in the linear way that this transform does, but this approximation still did an alright job. In order to understand the steering angle adjustment factor you would have to read the code, but I documented the generator function in great detail in case you're interested.
 * Rotation: I experimented with rotating images to simulate a change in the curvature of the road, but in most cases this does not yield a realistic approximation, and more importantly it is inferior to the perspective transform described above. I did not end up using this transform.
 * Incline perspective transform: While it generally actually is a more realistic approximation than the curvature transform above, it turned out to be completely unnecessary - I did not end up using this.
@@ -123,7 +123,7 @@ Note that `assemble_filelists()` returns the steering angle list as a list with 
 
 ###A Word on Validation
 
-I did use a validation dataset, but while the validation error is helpful to monitor overfitting and to make sure that your model is getting better, it is not the crucial metric to look at here. Your model either can or cannot drive the car around the entire track, and the validation error can't tell you when that point is reached (if your validation dataset even reflects all relevant situations!). Consider this: Whether your model predicts slightly incorrect steering angles in a lot of situations or a severely incorrect steering angle in only one situation might result in roughly the same validation error, but in the former case your car might make it around the track and in the latter case it will drive off a cliff. And if, in the latter case, that one situation where your model fails badly is not reflected in your validation dataset, then you might even get a near-zero validation error despite the model failing. The bottom line is, the validation error played only a small role for the decisions I made, the crucial and more insightful test is to watch your model in autonomous mode.
+I did use a validation dataset, but while the validation error is helpful to monitor overfitting and to make sure that your model is getting better, it is not the crucial metric to look at here. Your model either can or cannot drive the car around the entire track, and the validation error can't tell you when that point is reached (if your validation dataset even reflects all relevant situations!). Consider this: Whether your model predicts slightly incorrect steering angles in a lot of situations or a severely incorrect steering angle in only one situation might result in roughly the same validation error, but in the former case your car might make it around the track and in the latter case it will drive off a cliff. And if, in the latter case, that one situation where your model fails badly is not reflected in your validation dataset, then you might even get a near-zero validation error despite the model failing. The bottom line is, the validation error played only a small role for the decisions I made, the crucial and more insightful test is to watch your model drive in autonomous mode.
 
 ###The Training Process
 
