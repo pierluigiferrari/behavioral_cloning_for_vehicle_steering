@@ -1,4 +1,4 @@
-##Behavioral Cloning for Autonomous Driving Project
+##Behavioral Cloning for Autonomous Driving
 
 ###Overview
 
