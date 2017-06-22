@@ -4,7 +4,7 @@
 
 The goal of this project was to train a convolutional neural network built with [Keras](https://keras.io) to learn to drive a car around tracks in a simulator by mimicking human driving behavior via end-to-end learning, i.e. predicting steering commands directly from the image input of a single front-facing camera. You can find videos of the training results at the bottom of this page.
 
-### Basic use instructions
+### Basic Use Instructions
 
 Clone or fork this repository.
 
